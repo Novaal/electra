@@ -73,6 +73,54 @@ Use `run_pretraining.py` to pre-train an ELECTRA model. It has the following arg
 *  `--model-name`: a name for the model being trained. Model weights will be saved in `<data-dir>/models/<model-name>` by default.
 * `--hparams` (optional): a JSON dict or path to a JSON file containing model hyperparameters, data paths, etc. See `configure_pretraining.py` for the supported hyperparameters.
 
+```json
+{
+  "debug": false,
+  "do_train": true,
+  "do_eval": false,
+
+  "electra_objective": true,
+  "gen_weight": 1.0,
+  "disc_weight": 50.0,
+  "mask_prob": 0.15,
+
+  "learning_rate": 5e-4,
+  "lr_decay_power": 1.0,
+  "weight_decay_rate": 0.01,
+  "num_warmup_steps": 10000,
+
+  "iterations_per_loop": 200,
+  "save_checkpoints_steps": 1000,
+  "num_train_steps": 1000000,
+  "num_eval_steps": 100,
+  "keep_checkpoint_max": 5,
+
+  "model_size": "small",
+  "embedding_size": null,
+  "vocab_size": 50000,
+  "do_lower_case": true,
+
+  "uniform_generator": false,
+  "untied_generator_embeddings": false,
+  "untied_generator": true,
+  "generator_layers": 1.0,
+  "generator_hidden_size": 0.25,
+  "disallow_correct": false,
+  "temperature": 1.0,
+
+  "max_seq_length": 128,
+  "train_batch_size": 128,
+  "eval_batch_size": 128,
+
+  "use_tpu": false,
+  "num_tpu_cores": 1,
+  "tpu_job_name": null,
+  "tpu_name": null,
+  "tpu_zone": null,
+  "gcp_project": null
+}
+```
+
 If training is halted, re-running the `run_pretraining.py` with the same arguments will continue the training where it left off.
 
 You can continue pre-training from the released ELECTRA checkpoints by
