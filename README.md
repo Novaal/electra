@@ -32,7 +32,19 @@ On [GLUE](https://gluebenchmark.com/), ELECTRA-Large scores slightly better than
 * [NumPy](https://numpy.org/)
 * [scikit-learn](https://scikit-learn.org/stable/) and [SciPy](https://www.scipy.org/) (for computing some evaluation metrics).
 
+```
+pip install -r requirements.txt
+```
+
 ## Pre-training
+
+### Build vocab on text files
+
+```bash
+python create_vocab.py
+```
+
+### Build pretraining dataset from text-files
 Use `build_pretraining_dataset.py` to create a pre-training dataset from a dump of raw text. It has the following arguments:
 
 * `--corpus-dir`: A directory containing raw text files to turn into ELECTRA examples. A text file can contain multiple documents with empty lines separating them.
@@ -43,6 +55,18 @@ Use `build_pretraining_dataset.py` to create a pre-training dataset from a dump 
 * `--blanks-separate-docs`: Whether blank lines indicate document boundaries (True by default).
 * `--do-lower-case/--no-lower-case`: Whether to lower case the input text (True by default).
 
+```bash
+python build_pretraining_dataset.py \
+    --corpus-dir="./input" \
+    --vocab-file="./data/vocab.txt" \
+    --output-dir="./data/pretrain_tfrecords" \
+    --max-seq-length="128" \
+    --num-processes="1" \
+    --blanks-separate-docs="False"
+    --do-lower-case
+```
+
+### Run pretraining
 Use `run_pretraining.py` to pre-train an ELECTRA model. It has the following arguments:
 
 * `--data-dir`: a directory where pre-training data, model weights, etc. are stored. By default, the training loads examples from `<data-dir>/pretrain_tfrecords` and a vocabulary from `<data-dir>/vocab.txt`.
@@ -56,6 +80,13 @@ You can continue pre-training from the released ELECTRA checkpoints by
 2. Setting `num_train_steps` by (for example) adding `"num_train_steps": 4010000` to the `--hparams`. This will continue training the small model for 10000 more steps (it has already been trained for 4e6 steps).
 3. Increase the learning rate to account for the linear learning rate decay. For example, to start with a learning rate of 2e-4 you should set the `learning_rate` hparam to 2e-4 * (4e6 + 10000) / 10000.
 4. For ELECTRA-Small, you also need to specifiy `"generator_hidden_size": 1.0` in the `hparams` because we did not use a small generator for that model.
+
+```bash
+python run_pretraining.py \
+    --data-dir="./data" \
+    --model-name="electra" \
+    --hparams="./data/config.json"
+```
 
 ##  Quickstart: Pre-train a small ELECTRA model.
 These instructions pre-train a small ELECTRA model (12 layers, 256 hidden size). Unfortunately, the data we used in the paper is not publicly available, so we will use the [OpenWebTextCorpus](https://skylion007.github.io/OpenWebTextCorpus/) released by Aaron Gokaslan and Vanya Cohen instead. The fully-trained model (~4 days on a v100 GPU) should perform roughly in between [GPT](https://s3-us-west-2.amazonaws.com/openai-assets/research-covers/language-unsupervised/language_understanding_paper.pdf) and BERT-Base in terms of GLUE performance. By default the model is trained on length-128 sequences, so it is not suitable for running on question answering. See the "expected results" section below for more details on model performance.

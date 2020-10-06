@@ -1,0 +1,4 @@
+tensorflow-gpu==1.15
+tokenizers==0.8.1
+scikit-learn==0.23.2
+numpy==1.19.1
